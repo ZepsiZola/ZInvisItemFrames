@@ -5,7 +5,7 @@ A lightweight Minecraft plugin that allows players to craft and use invisible it
 ## Features
 
 - Craft invisible item frames
-- Customizable crafting recipe
+- Customizable crafting recipe. (Can choose ANY ITEM for the recipe)
 - Empty invisible frames can have a glowing outline (configurable)
 - Fully compatible with Folia and Paper servers
 - MiniMessage support for all text formatting
@@ -45,9 +45,5 @@ empty-frame:
 name:
   invis-item_frame: "<italic>Invisible Item Frame"
   invis-glow_item_frame: "<italic>Invisible Glow Item Frame"
-
-messages:
-  # Various messages used by the plugin
-  # Supports MiniMessage formatting
-
+```
 
