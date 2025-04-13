@@ -7,8 +7,13 @@ A lightweight Minecraft plugin that allows players to craft and use invisible it
 - Craft invisible item frames
 - Customizable crafting recipe. (Can choose ANY ITEM for the recipe)
 - Empty invisible frames can have a glowing outline (configurable)
-- Fully compatible with Folia and Paper servers
 - MiniMessage support for all text formatting
+
+## Compatibility
+
+- Supports 1.20.1 --> 1.21.4
+- Folia-compatible
+- Java 17+
 
 ## Crafting Recipe
 
