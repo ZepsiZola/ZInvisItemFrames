@@ -5,24 +5,16 @@
 #   / /__ _| |_| | | \ V /| \__ \ |  | | | (_| | | | | | |  __/\__ \
 #  /_____|_____|_| |_|\_/ |_|___/_|  |_|  \__,_|_| |_| |_|\___||___/
 #
-# --- IMPORTANT INFO --- PLEASE READ ---
-# Invis Item-frame recipe: 8 item-frames in a circle and one item of your choosing in the middle
-# You can set the custom item by putting the item in your mainhand and doing `/ziif item`
-
-# Visual (I = item_frame, C = your_custom_item)
-# I I I
-# I C I
-# I I I
 
 recipe:
   # Sets the middle item of the invisible item frame crafting recipe.
-  # Not a good idea to edit this ItemStack in the YML. Just do `/ziif item` with the item in your hand.
+  # Not a good idea to edit this ItemStack in the yml. Just do `/ziif item` with the item in your hand.
   item: []
   
   # How many invis item-frames will be created from the recipe.
   quantity: 8
 
-  # Whether to check permissions when a player crafts this recipe. 
+  # Whether to check permissions when a player crafts this recipe.
   check-permission: false
   # If you want only certain players to have access to the recipe, these are the permissions:
   # zinvisitemframes.craft.item_frame
@@ -34,12 +26,8 @@ recipe:
 
 empty-frame:
   # Whether an invisible item frame will have a glowing outline if it is empty.
-  # Good to stop people losing track of their invis frames
-  # (and to catch people using glow invis frames as an invisible light-source)
+  # Good to help people differentiate which frames are invis frames.
   glow: true
-  
-  # Colour with which the empty invis frame will glow.
-  glow-colour: "YELLOW"
 
 name:  
   # Item names can be formatted with MiniMessage

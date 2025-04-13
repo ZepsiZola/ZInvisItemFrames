@@ -13,7 +13,7 @@ A lightweight Minecraft plugin that allows players to craft and use invisible it
 ## Crafting Recipe
 
 The default crafting recipe is 8 item_frame (or glow_item_frame) in a circle with one custom item in the middle.
-You can change the middle-item with `/ziif item`
+You can change the middle-item with `/ziif item`.
 You can also configure how many invisible item frames are crafted from the recipe.
 
 ![Crafting Recipe](recipe_demo.png)
@@ -35,13 +35,12 @@ You can also configure how many invisible item frames are crafted from the recip
 
 ```yaml
 recipe:
-  item: []  # Set with /ziif item command
+  item: []  # Set with `/ziif item` command
   quantity: 1  # How many frames are crafted per recipe
   check-permission: false  # Whether to check permissions for crafting
 
 empty-frame:
   glow: true  # Whether empty frames should glow
-  glow-colour: "YELLOW"  # Color of the glow
 
 name:
   invis-item_frame: "<italic>Invisible Item Frame"
