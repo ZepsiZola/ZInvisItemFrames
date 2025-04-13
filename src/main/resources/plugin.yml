@@ -1,0 +1,24 @@
+name: ZInvisItemFrames
+version: '${version}'
+main: zepsizola.me.zinvisitemframes.ZInvisItemFrames
+api-version: '1.21'
+authors: [ 'Zepsi_Zola_' ]
+description: Lets players craft invisible item frames.
+folia-supported: true
+
+commands:
+  zinvisitemframes:
+    aliases: [ziif]
+    description: Main command for ZInvisItemFrames plugin.
+    usage: "/zinvisitemframes help"
+    permission: zinvisitemframes.admin
+permissions:
+  zinvisitemframes.craft.item_frame:
+    description: Allows players to craft an invisible item frame
+    default: op
+  zinvisitemframes.craft.glow_item_frame:
+    description: Allows players to craft an invisible glow item frame
+    default: op
+  zinvisitemframes.admin:
+    description: Gives access to all ZInvisItemFrames commands
+    default: op
