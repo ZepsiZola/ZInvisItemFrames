@@ -11,7 +11,7 @@ A lightweight Minecraft plugin that allows players to craft and use invisible it
 
 ## Compatibility
 
-- Supports 1.20.1 --> 1.21.4
+- Paper 1.20.1 -> 1.21.4
 - Folia-compatible
 - Java 17+
 
