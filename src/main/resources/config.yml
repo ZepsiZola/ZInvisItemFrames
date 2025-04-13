@@ -9,7 +9,10 @@
 recipe:
   # Sets the middle item of the invisible item frame crafting recipe.
   # Not a good idea to edit this ItemStack in the yml. Just do `/ziif item` with the item in your hand.
-  item: []
+  item:
+    ==: org.bukkit.inventory.ItemStack
+    v: 4189
+    type: GLASS
   
   # How many invis item-frames will be created from the recipe.
   quantity: 8
