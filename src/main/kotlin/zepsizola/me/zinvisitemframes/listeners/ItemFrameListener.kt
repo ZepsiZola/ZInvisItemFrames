@@ -130,5 +130,4 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
     fun onInvisFrameRemoveItem(event: EntityDamageByEntityEvent) {
         handleInvisFrameItemChange(event.entity)
     }
-    
 }

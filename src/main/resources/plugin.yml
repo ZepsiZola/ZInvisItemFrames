@@ -4,6 +4,7 @@ main: zepsizola.me.zinvisitemframes.ZInvisItemFrames
 api-version: '1.21'
 authors: [ 'Zepsi_Zola_' ]
 description: Lets players craft invisible item frames.
+depend: [MCKotlin-Paper]
 folia-supported: true
 
 commands:

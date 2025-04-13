@@ -4,7 +4,7 @@ A lightweight Minecraft plugin that allows players to craft and use invisible it
 
 ## Features
 
-- Craft invisible item frames and invisible glow item frames
+- Craft invisible item frames
 - Customizable crafting recipe
 - Empty invisible frames can have a glowing outline (configurable)
 - Fully compatible with Folia and Paper servers
@@ -12,10 +12,11 @@ A lightweight Minecraft plugin that allows players to craft and use invisible it
 
 ## Crafting Recipe
 
-The default crafting recipe is:
-Where:
-- I = Item Frame (or Glow Item Frame for invisible glow item frames)
-- C = Custom item (set with `/ziif item` command)
+The default crafting recipe is 8 item_frame (or glow_item_frame) in a circle with one custom item in the middle.
+You can change the middle-item with `/ziif item`
+You can also configure how many invisible item frames are crafted from the recipe.
+
+![Crafting Recipe](recipe_demo.png)
 
 ## Commands
 
