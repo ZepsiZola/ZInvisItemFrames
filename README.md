@@ -15,6 +15,10 @@ A lightweight Minecraft plugin that allows players to craft and use invisible it
 - Folia-compatible
 - Java 17+
 
+## Dependencies
+
+- [MCKotlin](https://modrinth.com/plugin/mckotlin)
+
 ## Crafting Recipe
 
 The default crafting recipe is 8 item_frame (or glow_item_frame) in a circle with one custom item in the middle.
@@ -35,6 +39,14 @@ You can also configure how many invisible item frames are crafted from the recip
 - `zinvisitemframes.craft.item_frame` - Allow crafting invisible item frames
 - `zinvisitemframes.craft.glow_item_frame` - Allow crafting invisible glow item frames
 - `zinvisitemframes.admin` - Access to all plugin commands
+
+## Installation
+
+1. Download the latest version of ZInvisItemFrames from [Modrinth](https://modrinth.com/plugin/zInvisItemFrames/versions).
+2. Download the appropriate version of MCKotlin from [Modrinth](https://modrinth.com/plugin/mckotlin)
+3. Place the downloaded `.jar` files into your server's `plugins/` folder.
+4. Restart your server.
+5. Configure the plugin to your liking by editing the `.yml` files in the `plugins/ZInvisItemFrames/` folder.
 
 ## Configuration
 
