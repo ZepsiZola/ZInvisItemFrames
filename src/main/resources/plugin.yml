@@ -1,7 +1,7 @@
 name: ZInvisItemFrames
 version: '${version}'
 main: zepsizola.me.zInvisItemFrames.ZInvisItemFrames
-api-version: '1.21'
+api-version: '1.20'
 authors: [ 'Zepsi_Zola_' ]
 description: Lets players craft invisible item frames.
 depend: [MCKotlin-Paper]

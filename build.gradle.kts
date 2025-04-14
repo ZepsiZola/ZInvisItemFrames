@@ -38,6 +38,15 @@ tasks {
         archiveVersion.set("")
         minimize()
     }
+
+    processResources {
+        val props = mapOf("version" to project.version)
+        inputs.properties(props)
+        filteringCharset = "UTF-8"
+        filesMatching("plugin.yml") {
+            expand(props)
+        }
+    }
     
     build {
         dependsOn(shadowJar)
