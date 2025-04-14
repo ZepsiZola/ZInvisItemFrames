@@ -11,6 +11,7 @@ import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.ShapedRecipe
 import org.bukkit.persistence.PersistentDataType
 import org.bukkit.plugin.java.JavaPlugin
+import org.bstats.bukkit.Metrics
 import zepsizola.me.zInvisItemFrames.commands.ZInvisItemFramesCommand
 import zepsizola.me.zInvisItemFrames.listeners.ItemFrameListener
 import zepsizola.me.zInvisItemFrames.util.MessageUtil
@@ -41,6 +42,7 @@ class ZInvisItemFrames : JavaPlugin() {
 
         reloadPlugin()
         
+        setupBStats()
         logger.info("ZInvisItemFrames has been enabled!")
     }
     
@@ -103,6 +105,12 @@ class ZInvisItemFrames : JavaPlugin() {
         registerRecipes()
         glowEnabled = this.config.getBoolean("empty-frame.glow", false)
         checkPermissions = this.config.getBoolean("recipe.check-permission", false)
+    }
+
+    private fun setupBStats() {
+        // Initialize bStats
+        val pluginId = 25462
+        val metrics = Metrics(this, pluginId)
     }
 }
 
