@@ -53,7 +53,7 @@ You can also configure how many invisible item frames are crafted from the recip
 ```yaml
 recipe:
   item: []  # Set with `/ziif item` command
-  quantity: 1  # How many frames are crafted per recipe
+  quantity: 8  # How many frames are crafted per recipe
   check-permission: false  # Whether to check permissions for crafting
 
 empty-frame:
