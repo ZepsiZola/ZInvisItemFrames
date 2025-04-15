@@ -1,28 +1,28 @@
 package zepsizola.me.zInvisItemFrames.listeners
 
+import java.util.function.Consumer
+import org.bukkit.Location
 import org.bukkit.GameMode
 import org.bukkit.Material
+import org.bukkit.util.Vector
+import org.bukkit.block.BlockFace
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.ItemFrame
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
+import org.bukkit.persistence.PersistentDataType
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.hanging.HangingPlaceEvent
 import org.bukkit.event.hanging.HangingBreakEvent
 import org.bukkit.event.hanging.HangingBreakByEntityEvent
 import org.bukkit.event.inventory.PrepareItemCraftEvent
 import io.papermc.paper.event.player.PlayerItemFrameChangeEvent
 import io.papermc.paper.event.player.PlayerItemFrameChangeEvent.ItemFrameChangeAction
-import org.bukkit.event.player.PlayerInteractEntityEvent
-import org.bukkit.inventory.ItemStack
-import org.bukkit.persistence.PersistentDataType
-import java.util.function.Consumer
-import org.bukkit.util.Vector
-import org.bukkit.block.BlockFace
-import org.bukkit.Location
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask
 import zepsizola.me.zInvisItemFrames.ZInvisItemFrames
 
@@ -103,7 +103,6 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
             itemFrame.remove()
             if (player?.gameMode == GameMode.CREATIVE) return@Consumer
             val vector = itemFrame.facing.direction.multiply(0.15) // Makes sure the item drops just a little bit away from the wall.
-            // itemFrame.world.dropItemNaturally(itemFrame.location.add(vector), drop)
             itemFrame.world.dropItem(itemFrame.location.add(vector), drop)
         }, null)
     }
