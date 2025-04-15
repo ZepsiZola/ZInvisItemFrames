@@ -14,10 +14,15 @@ import org.bukkit.event.hanging.HangingPlaceEvent
 import org.bukkit.event.hanging.HangingBreakEvent
 import org.bukkit.event.hanging.HangingBreakByEntityEvent
 import org.bukkit.event.inventory.PrepareItemCraftEvent
+import io.papermc.paper.event.player.PlayerItemFrameChangeEvent
+import io.papermc.paper.event.player.PlayerItemFrameChangeEvent.ItemFrameChangeAction
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import java.util.function.Consumer
+import org.bukkit.util.Vector
+import org.bukkit.block.BlockFace
+import org.bukkit.Location
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask
 import zepsizola.me.zInvisItemFrames.ZInvisItemFrames
 
@@ -31,34 +36,16 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
 
     // Retrns the item frame if it is an invisible item frame, else returns null.
     fun getInvisItemFrame(entity: Entity): ItemFrame? {
-        if (entity.type != EntityType.ITEM_FRAME && entity.type != EntityType.GLOW_ITEM_FRAME) {
-            return null
-        }
-        val itemFrame = entity as ItemFrame
-        if (!itemFrame.persistentDataContainer.has(plugin.invisItemFrameKey, PersistentDataType.BYTE)) {
-            return null
-        }
-        return itemFrame
-    }
-
-    fun handleInvisFrameItemChange(entity: Entity) {
-        val itemFrame = getInvisItemFrame(entity) ?: return
-        itemFrame.scheduler.run(plugin, Consumer { _: ScheduledTask ->
-            val isEmpty = itemFrame.item.type == Material.AIR
-            itemFrame.isGlowing = plugin.glowEnabled && isEmpty
-            itemFrame.isVisible = isEmpty
-        }, null)
+        if (entity.type != EntityType.ITEM_FRAME && entity.type != EntityType.GLOW_ITEM_FRAME) return null
+        if (!(entity as ItemFrame).persistentDataContainer.has(plugin.invisItemFrameKey, PersistentDataType.BYTE)) return null
+        return entity
     }
 
     @EventHandler(priority = EventPriority.HIGH)
     fun onPrepareItemCraft(event: PrepareItemCraftEvent) {
-        if (!plugin.checkPermissions) {
-            return
-        }
+        if (!plugin.checkPermissions) return
         val result = event.inventory.result ?: return
-        if (!itemIsInvisFrame(result)) {
-            return
-        }
+        if (!itemIsInvisFrame(result)) return
         val player = event.view.player as? Player ?: return
         val permission = if (result.type == Material.GLOW_ITEM_FRAME) {
             "zinvisitemframes.craft.glow_item_frame"
@@ -67,7 +54,6 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
         }
         if (!player.hasPermission(permission)) {
             event.inventory.result = null
-            // plugin.messageUtil.sendMessage(player, "error.no-access")
         }
     }
 
@@ -75,9 +61,7 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
     fun onInvisFramePlace(event: HangingPlaceEvent) {
         val player = event.player ?: return
         val entity = event.entity
-        if (entity.type != EntityType.ITEM_FRAME && entity.type != EntityType.GLOW_ITEM_FRAME) {
-            return
-        }
+        if (entity.type != EntityType.ITEM_FRAME && entity.type != EntityType.GLOW_ITEM_FRAME) return
         // Checks if...
         // - The item in the main hand is an invisible item frame.
         // - The item in the off hand is an invisible item frame and the main hand is not an item frame.
@@ -118,17 +102,23 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
             itemFrame.world.playSound(itemFrame.location, "entity.item_frame.break", 1.0f, 1.0f)
             itemFrame.remove()
             if (player?.gameMode == GameMode.CREATIVE) return@Consumer
-            itemFrame.world.dropItemNaturally(itemFrame.location, drop)
+            val vector = itemFrame.facing.direction.multiply(0.15) // Makes sure the item drops just a little bit away from the wall.
+            // itemFrame.world.dropItemNaturally(itemFrame.location.add(vector), drop)
+            itemFrame.world.dropItem(itemFrame.location.add(vector), drop)
         }, null)
     }
 
+    // This function is called when a player interacts with an item frame.
+    // It checks if the item frame is invisible and if so...
+    // it sets the item frame to be visible and glowing if the action was REMOVE.
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    fun onInvisFrameAddItem(event: PlayerInteractEntityEvent) {
-        handleInvisFrameItemChange(event.rightClicked)
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    fun onInvisFrameRemoveItem(event: EntityDamageByEntityEvent) {
-        handleInvisFrameItemChange(event.entity)
+    fun onInvisFrameChange(event: PlayerItemFrameChangeEvent) {
+        val itemFrame = event.itemFrame
+        if (!itemFrame.persistentDataContainer.has(plugin.invisItemFrameKey, PersistentDataType.BYTE)) return
+        itemFrame.scheduler.run(plugin, Consumer { _: ScheduledTask ->
+            val isEmpty = event.getAction() == PlayerItemFrameChangeEvent.ItemFrameChangeAction.REMOVE
+            itemFrame.isGlowing = plugin.glowEnabled && isEmpty
+            itemFrame.isVisible = isEmpty
+        }, null)
     }
 }
