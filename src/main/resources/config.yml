@@ -6,6 +6,9 @@
 # \_____/\___/_| |_|\_/ |_|___/\___/ \__\___|_| |_| |_\_| |_|  \__,_|_| |_| |_|\___||___/
 #
 
+  # Extra info
+  # Invis glow_item_frame will have the same recipe as normal invis item_frame but with glow_item_frame
+
 recipe:
   # Sets the middle item of the invisible item frame crafting recipe.
   # Not a good idea to edit this ItemStack in the yml. Just do `/ziif item` with the item in your hand.
@@ -17,23 +20,25 @@ recipe:
   # How many invis item-frames will be created from the recipe.
   quantity: 8
 
+# If you don't intend on restricting access to invis item frames, keep these false.
+check-permission: 
+  # Whether to check permissions when a player places an invis item frame.
+  place: false
   # Whether to check permissions when a player crafts this recipe.
-  check-permission: false
-  # If you want only certain players to have access to the recipe, these are the permissions:
-  # zinvisitemframes.craft.item_frame
-  # zinvisitemframes.craft.glow_item_frame
+  craft: false
+ # zinvisitemframes.craft.item_frame
+ # zinvisitemframes.craft.glow_item_frame
+ # zinvisitemframes.place.item_frame
+ # zinvisitemframes.place.glow_item_frame
 
-  # Extra info
-  # Invisible glowing item frames are glow_item_frame that emit light
-  # Invis glow_item_frame will have the same recipe as normal invis item_frame but with glow_item_frame
-
+# Useful options to help people keep track of their invisible item frames.
 empty-frame:
-  # Whether an invisible item frame will have a glowing outline if it is empty.
-  # Good to help people differentiate which frames are invis frames.
+  # Whether an invisible item frame will have a glowing outline if it is empty (glowing outline is negated by invisibility).
   glow: true
+  # Whether an invisible item frame will be visible if it is empty.
+  visible: true
 
-name:  
-  # Item names can be formatted with MiniMessage
+name: # Item names can be formatted with MiniMessage
   invisible_item_frame: "<italic>Invisible Item Frame"
   invisible_glow_item_frame: "<italic>Invisible Glow Item Frame"
 
@@ -53,6 +58,7 @@ messages:
     recipe-update: "<green>Recipe item updated!"
   error:
     no-access: "<red>You don't have permission to run this command."
+    no-place: "<red>You don't have permission to place an <reset>%item_frame_type%<reset><red>."
     not-player: "<red>You must be a player to use this command."
     player-not-found: "<red>That player is not online."
     mainhand-empty: "<red>You must have an item in your main-hand."

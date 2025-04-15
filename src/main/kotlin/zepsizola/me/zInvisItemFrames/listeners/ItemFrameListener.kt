@@ -43,15 +43,11 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     fun onPrepareItemCraft(event: PrepareItemCraftEvent) {
-        if (!plugin.checkPermissions) return
+        if (!plugin.checkPermCraft) return
         val result = event.inventory.result ?: return
         if (!itemIsInvisFrame(result)) return
         val player = event.view.player as? Player ?: return
-        val permission = if (result.type == Material.GLOW_ITEM_FRAME) {
-            "zinvisitemframes.craft.glow_item_frame"
-        } else {
-            "zinvisitemframes.craft.item_frame"
-        }
+        val permission = if (result.type == Material.GLOW_ITEM_FRAME) "zinvisitemframes.craft.glow_item_frame" else "zinvisitemframes.craft.item_frame"
         if (!player.hasPermission(permission)) {
             event.inventory.result = null
         }
@@ -70,13 +66,20 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
                 return
             }
         }
+        val permission = if (entity.type == EntityType.GLOW_ITEM_FRAME) "zinvisitemframes.place.glow_item_frame" else "zinvisitemframes.place.item_frame"
+        val nameKey = if (entity.type == EntityType.GLOW_ITEM_FRAME) "invisible_glow_item_frame" else "invisible_item_frame"
+        if (!player.hasPermission(permission) && plugin.checkPermPlace) {
+            event.isCancelled = true
+            plugin.messageUtil.sendMessage(player, "error.no-place", "item_frame_type" to (plugin.config.getString("name.$nameKey") ?: nameKey))
+            return
+        }
         val itemFrame = entity as ItemFrame
-        // Set the placed item frame to be visible.
-        itemFrame.setVisible(true)
-        // Sets metadata for the item frame to show that it is an invisible item frame.
+        // Sets metadata for the item frame to indicate that it is an invisible item frame.
         itemFrame.persistentDataContainer.set(plugin.invisItemFrameKey, PersistentDataType.BYTE, 1)
+        // Set the placed item frame to be visible.
+        itemFrame.isVisible = plugin.visibleEmpty
         // Item frame only glows if empty-frame.glow in config.yml is true
-        itemFrame.isGlowing = plugin.glowEnabled
+        itemFrame.isGlowing = plugin.glowEmpty
     }
 
     // This function is called when an item frame is broken.
@@ -116,8 +119,8 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
         if (!itemFrame.persistentDataContainer.has(plugin.invisItemFrameKey, PersistentDataType.BYTE)) return
         itemFrame.scheduler.run(plugin, Consumer { _: ScheduledTask ->
             val isEmpty = event.getAction() == PlayerItemFrameChangeEvent.ItemFrameChangeAction.REMOVE
-            itemFrame.isGlowing = plugin.glowEnabled && isEmpty
-            itemFrame.isVisible = isEmpty
+            itemFrame.isGlowing = plugin.glowEmpty && isEmpty
+            itemFrame.isVisible = plugin.visibleEmpty && isEmpty
         }, null)
     }
 }

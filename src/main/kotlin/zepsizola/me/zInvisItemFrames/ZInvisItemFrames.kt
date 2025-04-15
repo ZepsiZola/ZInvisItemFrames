@@ -20,8 +20,10 @@ class ZInvisItemFrames : JavaPlugin() {
     
     lateinit var invisItemFrameKey: NamespacedKey
     lateinit var messageUtil: MessageUtil
-    var glowEnabled: Boolean = true
-    var checkPermissions: Boolean = false
+    var glowEmpty: Boolean = true
+    var visibleEmpty: Boolean = true
+    var checkPermCraft: Boolean = false
+    var checkPermPlace: Boolean = false
     
     override fun onEnable() {
         // Save default config if it doesn't exist
@@ -103,8 +105,10 @@ class ZInvisItemFrames : JavaPlugin() {
     fun reloadPlugin() {
         reloadConfig()
         registerRecipes()
-        glowEnabled = this.config.getBoolean("empty-frame.glow", false)
-        checkPermissions = this.config.getBoolean("recipe.check-permission", false)
+        glowEmpty = this.config.getBoolean("empty-frame.glow", true)
+        visibleEmpty = this.config.getBoolean("empty-frame.visible", true)
+        checkPermPlace = this.config.getBoolean("check-permission.place", false)
+        checkPermCraft = this.config.getBoolean("check-permission.craft", false)
     }
 
     private fun setupBStats() {

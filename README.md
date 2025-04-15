@@ -38,6 +38,8 @@ You can also configure how many invisible item frames are crafted from the recip
 
 - `zinvisitemframes.craft.item_frame` - Allow crafting invisible item frames
 - `zinvisitemframes.craft.glow_item_frame` - Allow crafting invisible glow item frames
+- `zinvisitemframes.place.item_frame` - Allow placing invisible item frames
+- `zinvisitemframes.place.glow_item_frame` - Allow placing invisible glow item frames
 - `zinvisitemframes.admin` - Access to all plugin commands
 
 ## Installation
@@ -54,13 +56,17 @@ You can also configure how many invisible item frames are crafted from the recip
 recipe:
   item: []  # Set with `/ziif item` command
   quantity: 8  # How many frames are crafted per recipe
-  check-permission: false  # Whether to check permissions for crafting
+
+check-permission: # Whether to check permissions for crafting/placing invis frames
+  craft: false
+  place: false
 
 empty-frame:
   glow: true  # Whether empty frames should glow
+  visible: true # Whether empty invis frames should be visible
 
 name:
-  invis-item_frame: "<italic>Invisible Item Frame"
-  invis-glow_item_frame: "<italic>Invisible Glow Item Frame"
+  invisible_item_frame: "<italic>Invisible Item Frame"
+  invisible_glow_item_frame: "<italic>Invisible Glow Item Frame"
 ```
 
