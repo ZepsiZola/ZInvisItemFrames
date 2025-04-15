@@ -1,6 +1,6 @@
 package zepsizola.me.zInvisItemFrames.listeners
 
-import org.bukkit.DyeColor
+import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
@@ -12,6 +12,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.hanging.HangingPlaceEvent
 import org.bukkit.event.hanging.HangingBreakEvent
+import org.bukkit.event.hanging.HangingBreakByEntityEvent
 import org.bukkit.event.inventory.PrepareItemCraftEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.inventory.ItemStack
@@ -99,26 +100,26 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
     // - cancels the default drop of the item frame.
     // - drops a custom invisible item frame instead of a regular one.
     // - also plays a sound effect for breaking the item frame.
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
     fun onInvisFrameBreak(event: HangingBreakEvent) {
         val entity = event.entity
         val itemFrame = getInvisItemFrame(entity) ?: return
-        if (!event.isCancelled) {
-            event.isCancelled = true
-            itemFrame.scheduler.run(plugin, Consumer { _: ScheduledTask ->
-                val isGlowItemFrame = entity.type == EntityType.GLOW_ITEM_FRAME
-                val material = if (isGlowItemFrame) Material.GLOW_ITEM_FRAME else Material.ITEM_FRAME
-                val nameKey = if (isGlowItemFrame) "invisible_glow_item_frame" else "invisible_item_frame"
-                val drop = ItemStack(material, 1)
-                val meta = drop.itemMeta
-                meta.displayName(plugin.messageUtil.formatName(nameKey))
-                meta.persistentDataContainer.set(plugin.invisItemFrameKey, PersistentDataType.BYTE, 1)
-                drop.itemMeta = meta
-                itemFrame.world.playSound(itemFrame.location, "entity.item_frame.break", 1.0f, 1.0f)
-                itemFrame.world.dropItemNaturally(itemFrame.location, drop)
-                itemFrame.remove()
-            }, null)
-        }
+        val player = (event as? HangingBreakByEntityEvent)?.remover as? Player
+        event.isCancelled = true
+        itemFrame.scheduler.run(plugin, Consumer { _: ScheduledTask ->
+            val isGlowItemFrame = entity.type == EntityType.GLOW_ITEM_FRAME
+            val material = if (isGlowItemFrame) Material.GLOW_ITEM_FRAME else Material.ITEM_FRAME
+            val nameKey = if (isGlowItemFrame) "invisible_glow_item_frame" else "invisible_item_frame"
+            val drop = ItemStack(material, 1)
+            val meta = drop.itemMeta
+            meta.displayName(plugin.messageUtil.formatName(nameKey))
+            meta.persistentDataContainer.set(plugin.invisItemFrameKey, PersistentDataType.BYTE, 1)
+            drop.itemMeta = meta
+            itemFrame.world.playSound(itemFrame.location, "entity.item_frame.break", 1.0f, 1.0f)
+            itemFrame.remove()
+            if (player?.gameMode == GameMode.CREATIVE) return@Consumer
+            itemFrame.world.dropItemNaturally(itemFrame.location, drop)
+        }, null)
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
