@@ -119,8 +119,8 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
         if (!itemFrame.persistentDataContainer.has(plugin.invisItemFrameKey, PersistentDataType.BYTE)) return
         itemFrame.scheduler.run(plugin, Consumer { _: ScheduledTask ->
             val isEmpty = event.getAction() == PlayerItemFrameChangeEvent.ItemFrameChangeAction.REMOVE
-            itemFrame.isGlowing = plugin.glowEmpty && isEmpty
-            itemFrame.isVisible = plugin.visibleEmpty && isEmpty
+            itemFrame.isGlowing = isEmpty && plugin.glowEmpty
+            itemFrame.isVisible = isEmpty && plugin.visibleEmpty
         }, null)
     }
 }
