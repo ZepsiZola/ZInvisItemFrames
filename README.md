@@ -1,6 +1,6 @@
 # ZInvisItemFrames
 
-A lightweight Minecraft plugin that allows players to craft and use invisible item frames.
+Allow players to craft and place invisible item frames. Folia-compatible.
 
 ## Features
 
