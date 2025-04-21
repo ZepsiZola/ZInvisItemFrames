@@ -11,12 +11,11 @@ import org.bukkit.entity.EntityType
 import org.bukkit.entity.ItemFrame
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.persistence.PersistentDataType
+import org.bukkit.persistence.PersistentDataHolder
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
-import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.hanging.HangingPlaceEvent
 import org.bukkit.event.hanging.HangingBreakEvent
@@ -45,28 +44,18 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
     }
 
     // Returns true if the entity (should be ItemFrame) is an invisible item frame.
-    fun Entity.hasInvisKey(): Boolean {
+    fun PersistentDataHolder.hasInvisKey(): Boolean {
         return this.persistentDataContainer.has(plugin.invisItemFrameKey, PersistentDataType.BYTE)
     }
 
-    // Returns true if the ItemStack represents an invisible item frame.
-    fun ItemStack.hasInvisKey(): Boolean {
-        return (this.hasItemMeta() && this.itemMeta.persistentDataContainer.has(plugin.invisItemFrameKey, PersistentDataType.BYTE))
+    // Sets the ItemFrame to be an invisible item frame.
+    fun PersistentDataHolder.setInvisKey() {
+        this.persistentDataContainer.set(plugin.invisItemFrameKey, PersistentDataType.BYTE, 1)
     }
 
     // Returns the item frame if it is an invisible item frame, else returns null.
     fun Entity.getInvisItemFrame(): ItemFrame? {
         return if (this.hasInvisKey()) (this as? ItemFrame) else null ?: return null
-    }
-
-    // Sets the ItemFrame to be an invisible item frame.
-    fun ItemFrame.setInvisKey() {
-        this.persistentDataContainer.set(plugin.invisItemFrameKey, PersistentDataType.BYTE, 1)
-    }
-
-    // Sets the ItemMeta to contain the invisItemFrameKey indicating it is an invisible item frame.
-    fun ItemMeta.setInvisKey() {
-        this.persistentDataContainer.set(plugin.invisItemFrameKey, PersistentDataType.BYTE, 1)
     }
 
     // Returns true if the ItemStack represents an invisible item frame.
@@ -81,12 +70,11 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
         return item
     }
 
-
     @EventHandler(priority = EventPriority.HIGH)
     fun onPrepareItemCraft(event: PrepareItemCraftEvent) {
         if (!plugin.checkPermCraft) return
         val result = event.inventory.result ?: return
-        if (!result.hasInvisKey()) return
+        if (!result.itemMeta.hasInvisKey()) return
         val player = event.view.player as? Player ?: return
         val permission = if (result.type == Material.GLOW_ITEM_FRAME) "zinvisitemframes.craft.glow_item_frame" else "zinvisitemframes.craft.item_frame"
         if (!player.hasPermission(permission)) {
@@ -101,8 +89,8 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
         // Checks if...
         // - The item in the main hand is an invisible item frame.
         // - The item in the off hand is an invisible item frame and the main hand is not an item frame.
-        if (!player.inventory.itemInMainHand.hasInvisKey()) {
-            if (!player.inventory.itemInOffHand.hasInvisKey() && player.inventory.itemInMainHand.type.isItemFrame()) {
+        if (!player.inventory.itemInMainHand.itemMeta.hasInvisKey()) {
+            if (!player.inventory.itemInOffHand.itemMeta.hasInvisKey() && player.inventory.itemInMainHand.type.isItemFrame()) {
                 return
             }
         }
