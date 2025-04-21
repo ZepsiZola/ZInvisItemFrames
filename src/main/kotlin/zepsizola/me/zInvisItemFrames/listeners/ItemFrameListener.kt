@@ -11,6 +11,7 @@ import org.bukkit.entity.EntityType
 import org.bukkit.entity.ItemFrame
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.persistence.PersistentDataType
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -27,25 +28,65 @@ import io.papermc.paper.threadedregions.scheduler.ScheduledTask
 import zepsizola.me.zInvisItemFrames.ZInvisItemFrames
 
 class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
-    
-    // Returns true if the item is an invisible item frame.
-    fun itemIsInvisFrame(item: ItemStack): Boolean {
-        return (item.hasItemMeta()
-            && item.itemMeta.persistentDataContainer.has(plugin.invisItemFrameKey, PersistentDataType.BYTE))
+
+    // Returns true if the Material is an item frame (ITEM_FRAME or GLOW_ITEM_FRAME).
+    fun Material.isItemFrame(): Boolean {
+        return (this == Material.ITEM_FRAME || this == Material.GLOW_ITEM_FRAME)
     }
 
-    // Retrns the item frame if it is an invisible item frame, else returns null.
-    fun getInvisItemFrame(entity: Entity): ItemFrame? {
-        if (entity.type != EntityType.ITEM_FRAME && entity.type != EntityType.GLOW_ITEM_FRAME) return null
-        if (!(entity as ItemFrame).persistentDataContainer.has(plugin.invisItemFrameKey, PersistentDataType.BYTE)) return null
-        return entity
+    // Returns tre if the entity is a GLOW_ITEM_FRAME.
+    fun Entity.isGlowItemFrame(): Boolean {
+        return this.type == EntityType.GLOW_ITEM_FRAME
     }
+
+    // Returns true if the Material is a GLOW_ITEM_FRAME.
+    fun Material.isGlowItemFrame(): Boolean {
+        return (this == Material.GLOW_ITEM_FRAME)
+    }
+
+    // Returns true if the entity (should be ItemFrame) is an invisible item frame.
+    fun Entity.hasInvisKey(): Boolean {
+        return this.persistentDataContainer.has(plugin.invisItemFrameKey, PersistentDataType.BYTE)
+    }
+
+    // Returns true if the ItemStack represents an invisible item frame.
+    fun ItemStack.hasInvisKey(): Boolean {
+        return (this.hasItemMeta() && this.itemMeta.persistentDataContainer.has(plugin.invisItemFrameKey, PersistentDataType.BYTE))
+    }
+
+    // Returns the item frame if it is an invisible item frame, else returns null.
+    fun Entity.getInvisItemFrame(): ItemFrame? {
+        return if (this.hasInvisKey()) (this as? ItemFrame) else null ?: return null
+    }
+
+    // Sets the ItemFrame to be an invisible item frame.
+    fun ItemFrame.setInvisKey() {
+        this.persistentDataContainer.set(plugin.invisItemFrameKey, PersistentDataType.BYTE, 1)
+    }
+
+    // Sets the ItemMeta to contain the invisItemFrameKey indicating it is an invisible item frame.
+    fun ItemMeta.setInvisKey() {
+        this.persistentDataContainer.set(plugin.invisItemFrameKey, PersistentDataType.BYTE, 1)
+    }
+
+    // Returns true if the ItemStack represents an invisible item frame.
+    fun createInvisItemFrameItem(isGlowItemFrame: Boolean = false): ItemStack {
+        val material = if (isGlowItemFrame) Material.GLOW_ITEM_FRAME else Material.ITEM_FRAME
+        val nameKey = if (isGlowItemFrame) "invisible_glow_item_frame" else "invisible_item_frame"
+        val item = ItemStack(material, 1)
+        val meta = item.itemMeta
+        meta.displayName(plugin.messageUtil.formatName(nameKey))
+        meta.setInvisKey()
+        item.itemMeta = meta
+        return item
+    }
+
 
     @EventHandler(priority = EventPriority.HIGH)
     fun onPrepareItemCraft(event: PrepareItemCraftEvent) {
         if (!plugin.checkPermCraft) return
         val result = event.inventory.result ?: return
-        if (!itemIsInvisFrame(result)) return
+        if (!result.hasInvisKey()) return
         val player = event.view.player as? Player ?: return
         val permission = if (result.type == Material.GLOW_ITEM_FRAME) "zinvisitemframes.craft.glow_item_frame" else "zinvisitemframes.craft.item_frame"
         if (!player.hasPermission(permission)) {
@@ -56,29 +97,25 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     fun onInvisFramePlace(event: HangingPlaceEvent) {
         val player = event.player ?: return
-        val entity = event.entity
-        if (entity.type != EntityType.ITEM_FRAME && entity.type != EntityType.GLOW_ITEM_FRAME) return
+        val itemFrame = (event.entity as ItemFrame)
         // Checks if...
         // - The item in the main hand is an invisible item frame.
         // - The item in the off hand is an invisible item frame and the main hand is not an item frame.
-        if (!itemIsInvisFrame(player.inventory.itemInMainHand)) {
-            if (!(itemIsInvisFrame(player.inventory.itemInOffHand) && (player.inventory.itemInMainHand.type != Material.ITEM_FRAME && player.inventory.itemInMainHand.type != Material.GLOW_ITEM_FRAME))) {
+        if (!player.inventory.itemInMainHand.hasInvisKey()) {
+            if (!player.inventory.itemInOffHand.hasInvisKey() && player.inventory.itemInMainHand.type.isItemFrame()) {
                 return
             }
         }
-        val permission = if (entity.type == EntityType.GLOW_ITEM_FRAME) "zinvisitemframes.place.glow_item_frame" else "zinvisitemframes.place.item_frame"
-        val nameKey = if (entity.type == EntityType.GLOW_ITEM_FRAME) "invisible_glow_item_frame" else "invisible_item_frame"
+        val permission = if (itemFrame.isGlowItemFrame()) "zinvisitemframes.place.glow_item_frame" else "zinvisitemframes.place.item_frame"
+        val nameKey = if (itemFrame.isGlowItemFrame()) "invisible_glow_item_frame" else "invisible_item_frame"
         if (!player.hasPermission(permission) && plugin.checkPermPlace) {
             event.isCancelled = true
             plugin.messageUtil.sendMessage(player, "error.no-place", "item_frame_type" to (plugin.config.getString("name.$nameKey") ?: nameKey))
             return
         }
-        val itemFrame = entity as ItemFrame
-        // Sets metadata for the item frame to indicate that it is an invisible item frame.
-        itemFrame.persistentDataContainer.set(plugin.invisItemFrameKey, PersistentDataType.BYTE, 1)
-        // Set the placed item frame to be visible.
+        itemFrame.setInvisKey() // Sets metadata for the item frame to indicate that it is an invisible item frame.
+        // Item frame is visible/glowing if empty-frame.glow and empty-frame.visible in config.yml are true
         itemFrame.isVisible = plugin.visibleEmpty
-        // Item frame only glows if empty-frame.glow in config.yml is true
         itemFrame.isGlowing = plugin.glowEmpty
     }
 
@@ -89,22 +126,14 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
     // - also plays a sound effect for breaking the item frame.
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
     fun onInvisFrameBreak(event: HangingBreakEvent) {
-        val entity = event.entity
-        val itemFrame = getInvisItemFrame(entity) ?: return
+        val itemFrame = event.entity.getInvisItemFrame() ?: return
         val player = (event as? HangingBreakByEntityEvent)?.remover as? Player
         event.isCancelled = true
         itemFrame.scheduler.run(plugin, Consumer { _: ScheduledTask ->
-            val isGlowItemFrame = entity.type == EntityType.GLOW_ITEM_FRAME
-            val material = if (isGlowItemFrame) Material.GLOW_ITEM_FRAME else Material.ITEM_FRAME
-            val nameKey = if (isGlowItemFrame) "invisible_glow_item_frame" else "invisible_item_frame"
-            val drop = ItemStack(material, 1)
-            val meta = drop.itemMeta
-            meta.displayName(plugin.messageUtil.formatName(nameKey))
-            meta.persistentDataContainer.set(plugin.invisItemFrameKey, PersistentDataType.BYTE, 1)
-            drop.itemMeta = meta
             itemFrame.world.playSound(itemFrame.location, "entity.item_frame.break", 1.0f, 1.0f)
             itemFrame.remove()
             if (player?.gameMode == GameMode.CREATIVE) return@Consumer
+            val drop = createInvisItemFrameItem(itemFrame.isGlowItemFrame())
             val vector = itemFrame.facing.direction.multiply(0.15) // Makes sure the item drops just a little bit away from the wall.
             itemFrame.world.dropItem(itemFrame.location.add(vector), drop)
         }, null)
@@ -116,7 +145,7 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onInvisFrameChange(event: PlayerItemFrameChangeEvent) {
         val itemFrame = event.itemFrame
-        if (!itemFrame.persistentDataContainer.has(plugin.invisItemFrameKey, PersistentDataType.BYTE)) return
+        if (!itemFrame.hasInvisKey()) return
         itemFrame.scheduler.run(plugin, Consumer { _: ScheduledTask ->
             val isEmpty = event.getAction() == PlayerItemFrameChangeEvent.ItemFrameChangeAction.REMOVE
             itemFrame.isGlowing = isEmpty && plugin.glowEmpty
