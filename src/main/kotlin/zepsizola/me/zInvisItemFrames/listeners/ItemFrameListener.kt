@@ -33,19 +33,23 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
         return (this == Material.ITEM_FRAME || this == Material.GLOW_ITEM_FRAME)
     }
 
-    // Returns tre if the entity is a GLOW_ITEM_FRAME.
-    fun Entity.isGlowItemFrame(): Boolean {
-        return this.type == EntityType.GLOW_ITEM_FRAME
-    }
-
     // Returns true if the Material is a GLOW_ITEM_FRAME.
     fun Material.isGlowItemFrame(): Boolean {
         return (this == Material.GLOW_ITEM_FRAME)
     }
 
-    // Returns true if the entity (should be ItemFrame) is an invisible item frame.
+    // Returns tre if the entity is a GLOW_ITEM_FRAME.
+    fun Entity.isGlowItemFrame(): Boolean {
+        return this.type == EntityType.GLOW_ITEM_FRAME
+    }
+
+    // Returns true if the entity is an invisible item frame. Should be called on ItemFrame or Entity.
     fun PersistentDataHolder.hasInvisKey(): Boolean {
-        return this.persistentDataContainer.has(plugin.invisItemFrameKey, PersistentDataType.BYTE)
+        try {
+            return (this.persistentDataContainer.has(plugin.invisItemFrameKey, PersistentDataType.BYTE)) ?: false
+        } catch (e: NullPointerException) {
+            return false
+        }
     }
 
     // Sets the ItemFrame to be an invisible item frame.
@@ -88,11 +92,11 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
         val itemFrame = (event.entity as ItemFrame)
         // Checks if...
         // - The item in the main hand is an invisible item frame.
-        // - The item in the off hand is an invisible item frame and the main hand is not an item frame.
-        if (!player.inventory.itemInMainHand.itemMeta.hasInvisKey()) {
-            if (!player.inventory.itemInOffHand.itemMeta.hasInvisKey() && player.inventory.itemInMainHand.type.isItemFrame()) {
-                return
-            }
+        // - The item in the off hand is an invisible item frame and the main hand is an item frame.
+        val mainHandInvis = player.inventory.itemInMainHand.itemMeta?.hasInvisKey() ?: false
+        val offHandInvis = player.inventory.itemInOffHand.itemMeta?.hasInvisKey() ?: false
+        if (!mainHandInvis || (offHandInvis && player.inventory.itemInMainHand.type.isItemFrame())) {
+            return
         }
         val permission = if (itemFrame.isGlowItemFrame()) "zinvisitemframes.place.glow_item_frame" else "zinvisitemframes.place.item_frame"
         val nameKey = if (itemFrame.isGlowItemFrame()) "invisible_glow_item_frame" else "invisible_item_frame"
