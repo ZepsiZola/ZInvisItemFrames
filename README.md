@@ -11,7 +11,7 @@ Allow players to craft and place invisible item frames. Folia-compatible.
 
 ## Compatibility
 
-- Paper 1.20.1 -> 1.21.4
+- Paper 1.20.1 -> 1.21.5
 - Folia-compatible
 - Java 17+
 

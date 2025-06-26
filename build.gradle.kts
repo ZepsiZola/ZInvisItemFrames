@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "zepsizola.me"
-version = "1.2"
+version = "1.5"
 
 repositories {
     mavenCentral()

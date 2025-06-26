@@ -46,7 +46,7 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
     // Returns true if the entity is an invisible item frame. Should be called on ItemFrame or Entity.
     fun PersistentDataHolder.hasInvisKey(): Boolean {
         try {
-            return (this.persistentDataContainer.has(plugin.invisItemFrameKey, PersistentDataType.BYTE)) ?: false
+            return (this.persistentDataContainer.has(plugin.invisItemFrameKey, PersistentDataType.BYTE))
         } catch (e: NullPointerException) {
             return false
         }
@@ -86,7 +86,7 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
     fun onInvisFramePlace(event: HangingPlaceEvent) {
         val player = event.player ?: return
         val itemFrame = (event.entity as ItemFrame)
@@ -134,7 +134,7 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
     // This function is called when a player interacts with an item frame.
     // It checks if the item frame is invisible and if so...
     // it sets the item frame to be visible and glowing if the action was REMOVE.
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
     fun onInvisFrameChange(event: PlayerItemFrameChangeEvent) {
         val itemFrame = event.itemFrame
         if (!itemFrame.hasInvisKey()) return
