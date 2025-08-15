@@ -62,7 +62,7 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
         return if (this.hasInvisKey()) (this as? ItemFrame) else null ?: return null
     }
 
-    // Returns true if the ItemStack represents an invisible item frame.
+    // Returns an ItemStack of an invis-frame. Putting 'true' as an argument will create a GLOW_ITEM_FRAME.
     fun createInvisItemFrameItem(isGlowItemFrame: Boolean = false): ItemStack {
         val material = if (isGlowItemFrame) Material.GLOW_ITEM_FRAME else Material.ITEM_FRAME
         val nameKey = if (isGlowItemFrame) "invisible_glow_item_frame" else "invisible_item_frame"
@@ -116,7 +116,7 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
     // - cancels the default drop of the item frame.
     // - drops a custom invisible item frame instead of a regular one.
     // - also plays a sound effect for breaking the item frame.
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     fun onInvisFrameBreak(event: HangingBreakEvent) {
         val itemFrame = event.entity.getInvisItemFrame() ?: return
         val player = (event as? HangingBreakByEntityEvent)?.remover as? Player
@@ -134,7 +134,7 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
     // This function is called when a player interacts with an item frame.
     // It checks if the item frame is invisible and if so...
     // it sets the item frame to be visible and glowing if the action was REMOVE.
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     fun onInvisFrameChange(event: PlayerItemFrameChangeEvent) {
         val itemFrame = event.itemFrame
         if (!itemFrame.hasInvisKey()) return
