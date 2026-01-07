@@ -86,10 +86,10 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onInvisFramePlace(event: HangingPlaceEvent) {
         val player = event.player ?: return
-        val itemFrame = (event.entity as ItemFrame)
+        val itemFrame = (event.entity as? ItemFrame) ?: return
         // Checks if...
         // - The item in the main hand is an invisible item frame.
         // - The item in the off hand is an invisible item frame and the main hand is an item frame.
