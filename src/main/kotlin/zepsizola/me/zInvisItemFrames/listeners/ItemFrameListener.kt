@@ -115,7 +115,7 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
     // - cancels the default drop of the item frame.
     // - drops a custom invisible item frame instead of a regular one.
     // - also plays a sound effect for breaking the item frame.
-    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     fun onInvisFrameBreak(event: HangingBreakEvent) {
         val itemFrame = event.entity.getInvisItemFrame() ?: return
         val player = (event as? HangingBreakByEntityEvent)?.remover as? Player ?: return
