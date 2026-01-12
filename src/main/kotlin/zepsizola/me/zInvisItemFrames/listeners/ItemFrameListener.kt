@@ -25,6 +25,7 @@ import io.papermc.paper.event.player.PlayerItemFrameChangeEvent
 import io.papermc.paper.event.player.PlayerItemFrameChangeEvent.ItemFrameChangeAction
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask
 import zepsizola.me.zInvisItemFrames.ZInvisItemFrames
+import org.bukkit.inventory.EquipmentSlot
 
 class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
 
@@ -59,7 +60,8 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
 
     // Returns the item frame if it is an invisible item frame, else returns null.
     fun Entity.getInvisItemFrame(): ItemFrame? {
-        return if (this.hasInvisKey()) (this as? ItemFrame) else null ?: return null
+        if (!this.hasInvisKey()) return null
+        return this as ItemFrame
     }
 
     // Returns an ItemStack of an invis-frame. Putting 'true' as an argument will create a GLOW_ITEM_FRAME.
@@ -90,13 +92,10 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
     fun onInvisFramePlace(event: HangingPlaceEvent) {
         val player = event.player ?: return
         val itemFrame = (event.entity as? ItemFrame) ?: return
-        // Checks if...
-        // - The item in the main hand is an invisible item frame.
-        // - The item in the off hand is an invisible item frame and the main hand is an item frame.
-        val mainHandInvis = player.inventory.itemInMainHand.itemMeta?.hasInvisKey() ?: false
-        val offHandInvis = player.inventory.itemInOffHand.itemMeta?.hasInvisKey() ?: false
-        if (!mainHandInvis || (offHandInvis && player.inventory.itemInMainHand.type.isItemFrame())) {
-            return
+        val hand = (event.hand) ?: return
+        val hasInvis = player.inventory.getItem(hand).itemMeta?.hasInvisKey() ?: false
+        if (!hasInvis) {
+            return // Not placing an invis frame
         }
         val permission = if (itemFrame.isGlowItemFrame()) "zinvisitemframes.place.glow_item_frame" else "zinvisitemframes.place.item_frame"
         val nameKey = if (itemFrame.isGlowItemFrame()) "invisible_glow_item_frame" else "invisible_item_frame"
@@ -116,18 +115,20 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
     // - cancels the default drop of the item frame.
     // - drops a custom invisible item frame instead of a regular one.
     // - also plays a sound effect for breaking the item frame.
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     fun onInvisFrameBreak(event: HangingBreakEvent) {
         val itemFrame = event.entity.getInvisItemFrame() ?: return
-        val player = (event as? HangingBreakByEntityEvent)?.remover as? Player
+        val player = (event as? HangingBreakByEntityEvent)?.remover as? Player ?: return
         event.isCancelled = true
         itemFrame.scheduler.run(plugin, Consumer { _: ScheduledTask ->
+            val item = itemFrame.item
             itemFrame.world.playSound(itemFrame.location, "entity.item_frame.break", 1.0f, 1.0f)
             itemFrame.remove()
-            if (player?.gameMode == GameMode.CREATIVE) return@Consumer
+            if (player != null && player.gameMode == GameMode.CREATIVE) return@Consumer
             val drop = createInvisItemFrameItem(itemFrame.isGlowItemFrame())
             val vector = itemFrame.facing.direction.multiply(0.15) // Makes sure the item drops just a little bit away from the wall.
             itemFrame.world.dropItem(itemFrame.location.add(vector), drop)
+            if (item != null) itemFrame.world.dropItem(itemFrame.location.add(vector), item)
         }, null)
     }
 
