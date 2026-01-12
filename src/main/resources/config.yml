@@ -39,8 +39,8 @@ empty-frame:
   visible: true
 
 name: # Item names can be formatted with MiniMessage
-  invisible_item_frame: "<italic>Invisible Item Frame"
-  invisible_glow_item_frame: "<italic>Invisible Glow Item Frame"
+  invisible_item_frame: "Invisible Item Frame"
+  invisible_glow_item_frame: "Invisible Glow Item Frame"
 
 # Messages are formatted with MiniMessage.
 # (You probably will never need to edit these messages, but you can, in-case you want to translate them to another language.)
