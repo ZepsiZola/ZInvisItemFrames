@@ -75,7 +75,7 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
         val meta = item.itemMeta
         val name = plugin.messageUtil.formatName(nameKey)
         meta.itemName(name)
-        meta.customName(name)
+        // meta.customName(name)
         meta.setInvisKey()
         item.itemMeta = meta
         return item

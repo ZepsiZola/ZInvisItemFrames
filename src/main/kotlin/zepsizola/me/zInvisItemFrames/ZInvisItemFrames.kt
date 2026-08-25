@@ -88,7 +88,7 @@ class ZInvisItemFrames : JavaPlugin() {
         if (name != null) {
             val formattedName = MiniMessage.miniMessage().deserialize(name)
             meta.itemName(formattedName)
-            meta.customName(formattedName)
+            // meta.customName(formattedName)
         }
         
         // Mark as invisible item frame
