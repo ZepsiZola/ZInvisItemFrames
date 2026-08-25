@@ -24,6 +24,7 @@ class ZInvisItemFrames : JavaPlugin() {
     var visibleEmpty: Boolean = true
     var checkPermCraft: Boolean = false
     var checkPermPlace: Boolean = false
+    var showNexoItemName: Boolean = true
     
     override fun onEnable() {
         // Save default config if it doesn't exist
@@ -82,10 +83,12 @@ class ZInvisItemFrames : JavaPlugin() {
         val recipeResult = ItemStack(material, config.getInt("recipe.quantity", 1))
         val meta = recipeResult.itemMeta
         
-        // Set custom name from config
+        // Set item name and custom name from config
         val name = config.getString("name.$key")
         if (name != null) {
-            meta.displayName(MiniMessage.miniMessage().deserialize(name))
+            val formattedName = MiniMessage.miniMessage().deserialize(name)
+            meta.itemName(formattedName)
+            meta.customName(formattedName)
         }
         
         // Mark as invisible item frame
@@ -109,6 +112,7 @@ class ZInvisItemFrames : JavaPlugin() {
         visibleEmpty = this.config.getBoolean("empty-frame.visible", true)
         checkPermPlace = this.config.getBoolean("check-permission.place", false)
         checkPermCraft = this.config.getBoolean("check-permission.craft", false)
+        showNexoItemName = this.config.getBoolean("show_nexo_itemname", true)
     }
 
     private fun setupBStats() {
@@ -117,4 +121,3 @@ class ZInvisItemFrames : JavaPlugin() {
         val metrics = Metrics(this, pluginId)
     }
 }
-

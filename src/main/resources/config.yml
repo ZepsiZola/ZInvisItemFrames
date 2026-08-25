@@ -42,6 +42,8 @@ name: # Item names can be formatted with MiniMessage
   invisible_item_frame: "Invisible Item Frame"
   invisible_glow_item_frame: "Invisible Glow Item Frame"
 
+show_nexo_itemname: true # Show nexo item's itemname on hover as if it had a customname unless it has a customname, in which case, show that.
+
 # Messages are formatted with MiniMessage.
 # (You probably will never need to edit these messages, but you can, in-case you want to translate them to another language.)
 messages:

@@ -4,6 +4,7 @@ import java.util.function.Consumer
 import org.bukkit.Location
 import org.bukkit.GameMode
 import org.bukkit.Material
+import org.bukkit.NamespacedKey
 import org.bukkit.util.Vector
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Entity
@@ -28,6 +29,8 @@ import zepsizola.me.zInvisItemFrames.ZInvisItemFrames
 import org.bukkit.inventory.EquipmentSlot
 
 class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
+
+    private val nexoItemIdKey = requireNotNull(NamespacedKey.fromString("nexo:id"))
 
     // Returns true if the Material is an item frame (ITEM_FRAME or GLOW_ITEM_FRAME).
     fun Material.isItemFrame(): Boolean {
@@ -70,7 +73,9 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
         val nameKey = if (isGlowItemFrame) "invisible_glow_item_frame" else "invisible_item_frame"
         val item = ItemStack(material, 1)
         val meta = item.itemMeta
-        meta.displayName(plugin.messageUtil.formatName(nameKey))
+        val name = plugin.messageUtil.formatName(nameKey)
+        meta.itemName(name)
+        meta.customName(name)
         meta.setInvisKey()
         item.itemMeta = meta
         return item
@@ -145,4 +150,39 @@ class ItemFrameListener(private val plugin: ZInvisItemFrames) : Listener {
             itemFrame.isVisible = isEmpty && plugin.visibleEmpty
         }, null)
     }
+
+    // Fix an issue with Nexo itemnames not showing on hover in ItemFrames.
+    // Basically an item can have a customname and an itemname. Only the customname gets
+    // shown on hover. But it's wiser to use the itemname so that players can rename their
+    // Nexo items. Because Nexo reverts customname back to the item's base configuration.
+    // So yeah. This listener just applies the itemname to the customname if it is put in an
+    // ItemFrame, but if it already has a customname, then it doesn't do that.
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    fun onNexoItemPlacedInFrame(event: PlayerItemFrameChangeEvent) {
+        if (!plugin.showNexoItemName) return
+        if (event.action != ItemFrameChangeAction.PLACE) return
+
+        val originalItem = event.itemStack
+        val originalMeta = originalItem.itemMeta
+
+        // Only affect Nexo items.
+        if (!originalMeta.persistentDataContainer.has(nexoItemIdKey, PersistentDataType.STRING)) return
+
+        // Preserve an existing minecraft:custom_name.
+        if (originalMeta.hasCustomName()) return
+
+        // Nothing to copy if Nexo hasn't supplied minecraft:item_name.
+        if (!originalMeta.hasItemName()) return
+
+        // Clone so the held stack itself isn't modified.
+        val framedItem = originalItem.clone()
+        val framedMeta = framedItem.itemMeta
+        framedMeta.customName(framedMeta.itemName())
+        framedItem.itemMeta = framedMeta
+
+        // Paper places this modified copy into the frame.
+        event.setItemStack(framedItem)
+    }
 }
+
+
